@@ -27,4 +27,7 @@ void initialise_grid(std::vector<STATE>& grid);
 // Function to save to csv for python plotting
 void save_to_csv(std::vector<STATE>& grid, int step);
 
+// Function to update grid
+void update_grid(std::vector<STATE>& grid, double dt);
+
 #endif //AIRFOILCFD_SIMULATION_H
