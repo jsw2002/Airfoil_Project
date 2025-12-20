@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cctype>
 
 // Default airfoil NACA 2412
 double NACA_M = 0.02; // Max camber
@@ -26,6 +27,16 @@ void setup_airfoil() {
         NACA_M = 0.00; NACA_P = 0.00; NACA_T = 0.12;
         return;
     }
+
+    // Safety to check characters are ints
+    for (char c : code) {
+        if (!std::isdigit(c)) {
+            std::cout << "NACA code contains letters or symbols! Defaulting to NACA 0012." <<std::endl;
+            NACA_M = 0.00; NACA_P = 0.00; NACA_T = 0.12;
+            return;
+        }
+    }
+
 }
 
 // Create physics state
