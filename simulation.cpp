@@ -14,6 +14,16 @@ double NACA_M = 0.02; // Max camber
 double NACA_P = 0.40; // Camber position
 double NACA_T = 0.12; // Thickness
 
+// Creating airfoil from input
+void setup_airfoil() {
+    std::string code;
+    std::cout << "Enter NACA 4-digit code: ";
+    std::cin >> code;
+
+    // Safety to default to NACA 2412
+    if (code.length() != 4)
+}
+
 // Create physics state
 STATE create_state(double rho, double u, double v, double p) {
     STATE U;
