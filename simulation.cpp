@@ -20,8 +20,12 @@ void setup_airfoil() {
     std::cout << "Enter NACA 4-digit code: ";
     std::cin >> code;
 
-    // Safety to default to NACA 2412
-    if (code.length() != 4)
+    // Safety to default to NACA 0012
+    if (code.length() != 4) {
+        std::cout << "Invalid NACA code length! Defaulting to NACA 0012." << std::endl;
+        NACA_M = 0.00; NACA_P = 0.00; NACA_T = 0.12;
+        return;
+    }
 }
 
 // Create physics state
