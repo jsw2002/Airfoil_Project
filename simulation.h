@@ -6,12 +6,13 @@
 
 #include <vector>
 
-// Defining the state structure
+// Defining the state structure of a cell
 struct STATE {
     double rho; // Density
     double rho_u; // Momentum X
     double rho_v; // Momentum Y
     double E; // Energy
+    bool is_solid; // True if inside airfoil structure
 };
 
 // Simulation constants
