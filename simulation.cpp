@@ -52,7 +52,7 @@ void setup_airfoil() {
     double digit1 = code[0] - '0';
     double digit2 = code[1] - '0';
 
-    // Converting to percentage
+    // Converting to percentage and assigning
     NACA_M = digit1 / 100.0;
     NACA_P = digit2 / 10.0;
     NACA_T = thick_int / 100.0;
@@ -97,3 +97,26 @@ STATE compute_flux(const STATE& U, double nx, double ny) {
 }
 
 // Initialising grid
+void initialise_grid(std::vector<STATE> &grid) {
+    // Defining normalised freestream
+    double rho_inf = 1.0;
+    double p_inf = 1.0 / GAMMA;
+    double u_inf = 2.0; // Mach 2
+    double v_inf = 0.0; // Horizontal flow only
+
+    double E_inf = (p_inf / (GAMMA - 1.0)) + 0.5 * rho_inf * (u_inf * u_inf);
+
+    // For loop to initialise grid
+    for (int j = 0; j < NY; ++j) {
+        for (int i = 0; i < NX; ++i) {
+            int idx = j * NX + i; // Convert to 1D index
+
+            // Initialising cells
+            grid[idx].rho = rho_inf;
+            grid[idx].rho_u = u_inf * rho_inf;
+            grid[idx].rho_v = v_inf * rho_inf;
+            grid[idx].E = E_inf * rho_inf;
+        }
+    }
+}
+
