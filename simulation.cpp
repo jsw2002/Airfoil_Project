@@ -96,6 +96,16 @@ STATE compute_flux(const STATE& U, double nx, double ny) {
     return flux;
 }
 
+// Boolean function to check if coordinate is inside grid
+bool is_inside(double x, double y) {
+    // Setting up geometry
+    double chord = 1.0; // Length
+    double start_x = 0.5; // Start of airfoil in x
+    double centre_y = 0.5; // Centre of airfoil in y
+
+
+}
+
 // Initialising grid
 void initialise_grid(std::vector<STATE> &grid) {
     // Defining normalised freestream
@@ -104,7 +114,9 @@ void initialise_grid(std::vector<STATE> &grid) {
     double u_inf = 2.0; // Mach 2
     double v_inf = 0.0; // Horizontal flow only
 
-    double E_inf = (p_inf / (GAMMA - 1.0)) + 0.5 * rho_inf * (u_inf * u_inf);
+    // Creating states for freestream and boundary conditions
+    STATE freestream = create_state(rho_inf, u_inf, v_inf, p_inf);
+    STATE wall = create_state(1.0, 0.0, 0.0, p_inf);
 
     // For loop to initialise grid
     for (int j = 0; j < NY; ++j) {
