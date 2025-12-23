@@ -38,15 +38,24 @@ void setup_airfoil() {
     }
 
     // Parse thickness
-    int thick = std::stoi(code.substr(2,2));
+    int thick_int = std::stoi(code.substr(2,2));
 
     // Ensure thickness >1% and <40%
-    if (thick < 1 || thick > 40) {
+    if (thick_int < 1 || thick_int > 40) {
         std::cout << "Thickness must be between 1 and 40! Defaulting to NACA 0012." <<std::endl;
         NACA_M = 0.00; NACA_P = 0.00; NACA_T = 0.12;
         return;
     }
 
+    // Create digits 1 and 2
+    // - '0' for ASCII
+    double digit1 = code[0] - '0';
+    double digit2 = code[1] - '0';
+
+    // Converting to percentage
+    NACA_M = digit1 / 100.0;
+    NACA_P = digit2 / 10.0;
+    NACA_T = thick_int / 100.0;
 }
 
 // Create physics state
