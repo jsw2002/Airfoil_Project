@@ -103,6 +103,11 @@ bool is_inside(double x, double y) {
     double start_x = 0.5; // Start of airfoil in x
     double centre_y = 0.5; // Centre of airfoil in y
 
+    // Normalise x into a percentage of chord length
+    double norm_x = (x - start_x) / chord;
+
+    // Quick exit if not in airfoil length
+    if (norm_x < 0.0 || norm_x > 1.0) return false;
 
 }
 
