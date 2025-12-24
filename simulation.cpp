@@ -147,6 +147,17 @@ bool is_inside(double x, double y) {
     for (int i = 0; i < 5; ++i) {
         // Quick exit if not in airfoil length
         if (zeta_U < 0.0 || zeta_U > chord) break;
+
+        double m, theta, t;
+        get_params(zeta_U, m, theta, t);
+
+        // x-location of the surface at this guess
+        double x_loc = zeta_U - t * std::sin(theta);
+
+        //change zeta to fix error
+        double error = x_local - x_loc;
+        if (std::abs(error) < 1e-5) break;
+        zeta_U += error;
     }
 
 
