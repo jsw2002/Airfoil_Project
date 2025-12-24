@@ -144,6 +144,7 @@ bool is_inside(double x, double y) {
     // Find upper zeta
     double zeta_U = x_local; // Initial guess
 
+    // loop to guess zeta for upper
     for (int i = 0; i < 5; ++i) {
         // Quick exit if not in airfoil length
         if (zeta_U < 0.0 || zeta_U > chord) break;
@@ -158,6 +159,26 @@ bool is_inside(double x, double y) {
         double error = x_local - x_loc;
         if (std::abs(error) < 1e-5) break;
         zeta_U += error;
+    }
+
+    // Find lower zeta
+    double zeta_L = x_local; // Initial guess
+
+    // loop to guess zeta for upper
+    for (int i = 0; i < 5; ++i) {
+        // Quick exit if not in airfoil length
+        if (zeta_L < 0.0 || zeta_L > chord) break;
+
+        double m, theta, t;
+        get_params(zeta_L, m, theta, t);
+
+        // x-location of the surface at this guess
+        double x_loc = zeta_L + t * std::sin(theta);
+
+        //change zeta to fix error
+        double error = x_local - x_loc;
+        if (std::abs(error) < 1e-5) break;
+        zeta_L += error;
     }
 
 
