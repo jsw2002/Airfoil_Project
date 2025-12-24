@@ -252,6 +252,25 @@ void save_to_csv(std::vector<STATE> &grid, int step) {
             // Calculate primitive variables
             double rho = S.rho;
             double u = 0.0, v = 0.0, p = 0.0;
+
+            // Values for wall
+            if (S.is_solid) {
+                u = 0.0; v = 0.0;
+                p = 1.0 / GAMMA;
+            } else {
+                // Values for freestream
+                if (rho < 1e-6) rho = 1e-6; // Safety
+                u = S.rho_u / rho;
+                v = S.rho_v / rho;
+                p = (GAMMA - 1.0) * (S.E - 0.5 * rho * (u*u + v*v));
+            }
+            // Write the line
+            file << std::fixed << std::setprecision(5)
+                 << x << "," << y << ","
+                 << rho << "," << u << "," << v << "," << p << ","
+                 << (S.is_solid ? 1 : 0) << "\n";
         }
     }
+    file.close();
+    std::cout << "Saved " << filename << std::endl;
 }
