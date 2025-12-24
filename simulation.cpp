@@ -104,7 +104,7 @@ void get_params(double zeta, double& m, double& theta, double& t_half) {
     // Check if airfoil is non symmetrical
     if (NACA_M > 0.0 && NACA_P > 0.0) {
         // Front of airfoil
-        if (zeta <= NACA_P * chord) {
+        if (zeta <= NACA_P) {
             m = (NACA_M / (NACA_P * NACA_P)) * (2 * NACA_P * zeta - zeta * zeta);
             dm_dx = (2 * NACA_M / (NACA_P * NACA_P)) * (NACA_P - zeta); // Derivative for theta
         }
@@ -147,7 +147,7 @@ bool is_inside(double x, double y) {
     // loop to guess zeta for upper
     for (int i = 0; i < 5; ++i) {
         // Quick exit if not in airfoil length
-        if (zeta_U < 0.0 || zeta_U > chord) break;
+        if (zeta_U < 0.0 || zeta_U > 1.0) break;
 
         double m, theta, t;
         get_params(zeta_U, m, theta, t);
@@ -167,7 +167,7 @@ bool is_inside(double x, double y) {
     // loop to guess zeta for upper
     for (int i = 0; i < 5; ++i) {
         // Quick exit if not in airfoil length
-        if (zeta_L < 0.0 || zeta_L > chord) break;
+        if (zeta_L < 0.0 || zeta_L > 1.0) break;
 
         double m, theta, t;
         get_params(zeta_L, m, theta, t);
@@ -205,20 +205,27 @@ void initialise_grid(std::vector<STATE> &grid) {
     double u_inf = 2.0; // Mach 2
     double v_inf = 0.0; // Horizontal flow only
 
-    // Creating states for freestream and boundary conditions
+    // Creating states for freestream and boundary condition
     STATE freestream = create_state(rho_inf, u_inf, v_inf, p_inf);
     STATE wall = create_state(1.0, 0.0, 0.0, p_inf);
 
     // For loop to initialise grid
     for (int j = 0; j < NY; ++j) {
         for (int i = 0; i < NX; ++i) {
-            int idx = j * NX + i; // Convert to 1D index
+            int idx = j * NX + i;
 
-            // Initialising cells
-            grid[idx].rho = rho_inf;
-            grid[idx].rho_u = u_inf * rho_inf;
-            grid[idx].rho_v = v_inf * rho_inf;
-            grid[idx].E = E_inf * rho_inf;
+            // Converting index to physical coordinate
+            double x_phys = (double)i * DX;
+            double y_phys = (double)j * DY;
+
+            // Implementing airfoil check and assigning state
+            if (is_inside(x_phys, y_phys)) {
+                grid[idx] = wall;       // Initialise wall cell
+                grid[idx].is_solid = true; // Mark for solver
+            } else {
+                grid[idx] = freestream; // Initialise freestream cell
+                grid[idx].is_solid = false;
+            }
         }
     }
 }
