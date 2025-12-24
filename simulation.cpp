@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <iomanip>
 #include <algorithm>
 #include <cctype>
 
@@ -230,3 +231,27 @@ void initialise_grid(std::vector<STATE> &grid) {
     }
 }
 
+void save_to_csv(std::vector<STATE> &grid, int step) {
+    // Create filename
+    std::string filename = "output_" + std::to_string(step) + ".csv";
+    std::ofstream file(filename);
+
+    // Write header
+    file << "x,y,rho,u,v,p,is_solid\n";
+
+    // Loop through grid and write data
+    for (int j = 0; j < NY; ++j) {
+        for (int i = 0; i < NX; ++i) {
+            int idx = j * NX + i;
+            STATE& S = grid[idx];
+
+            // Convert to physical position
+            double x = i * DX;
+            double y = j * DY;
+
+            // Calculate primitive variables
+            double rho = S.rho;
+            double u = 0.0, v = 0.0, p = 0.0;
+        }
+    }
+}
