@@ -16,11 +16,14 @@ struct STATE {
 };
 
 // Simulation constants
-const int NX = 100;
-const int NY = 50;
+const int NX = 250;
+const int NY = 100;
 const double DX = 0.01;
 const double DY = 0.01;
 const double GAMMA = 1.4;
+
+// Function to setup airfoil params from user input
+void setup_airfoil();
 
 // Function to initialise grid
 void initialise_grid(std::vector<STATE>& grid);
