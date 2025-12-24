@@ -181,10 +181,20 @@ bool is_inside(double x, double y) {
         zeta_L += error;
     }
 
+    // Check if search has gone out of bounds
+    if (zeta_U < 0.0 || zeta_U > 1.0 || zeta_L < 0.0 || zeta_L > 1.0) return false;
 
+    // Get Y-heights at corrected zetas
+    double m_U, theta_U, t_U;
+    get_params(zeta_U, m_U, theta_U, t_U);
+    double y_upper = m_U + t_U * std::cos(theta_U);
 
-    // Quick exit if not in airfoil length
-    if (x_local < 0.0 || x_local > chord) return false;
+    double m_L, theta_L, t_L;
+    get_params(zeta_L, m_L, theta_L, t_L);
+    double y_lower = m_L - t_L * std::cos(theta_L);
+
+    // Check if inside airfoil
+    return (y_local <= y_upper && y_local >= y_lower);
 }
 
 // Initialising grid
