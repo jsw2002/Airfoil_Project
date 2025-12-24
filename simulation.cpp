@@ -100,14 +100,45 @@ STATE compute_flux(const STATE& U, double nx, double ny) {
 bool is_inside(double x, double y) {
     // Setting up geometry
     double chord = 1.0; // Length
-    double start_x = 0.5; // Start of airfoil in x
+    double x_LE = 0.5; // Start of airfoil in x
     double centre_y = 0.5; // Centre of airfoil in y
 
     // Normalise x into a percentage of chord length
-    double norm_x = (x - start_x) / chord;
+    double zeta = (x - x_LE) / chord;
 
     // Quick exit if not in airfoil length
-    if (norm_x < 0.0 || norm_x > 1.0) return false;
+    if (zeta < 0.0 || zeta > chord) return false;
+
+    // Initialising variables for airfoil structure
+    double m = 0.0; // Camber height
+    double dm_dx = 0.0; // Slope
+    double theta = 0.0; // Angle
+
+    // Check if airfoil is non symmetrical
+    if (NACA_M > 0.0 && NACA_P > 0.0) {
+        // Front of airfoil
+        if (zeta <= NACA_P * chord) {
+            m = (NACA_M / (NACA_P * NACA_P)) * (2 * NACA_P * zeta - zeta * zeta);
+            dm_dx = (2 * NACA_M / (NACA_P * NACA_P)) * (NACA_P - zeta); // Derivative for theta
+        }
+        // Back of airfoil
+        if (NACA_P * chord <= zeta) {
+            m = (NACA_M / ((1 - NACA_P) * (1 - NACA_P))) * (1.0 - zeta) * (1.0 + zeta - 2.0 * NACA_P);
+            dm_dx = (2.0 * NACA_M / ((1 - NACA_P) * (1 - NACA_P))) * (NACA_P - zeta); // Derivative for theta
+        }
+        // Calculate theta
+        theta = std::atan(dm_dx);
+
+        // Thickness terms
+        double term1 = 0.2969 * std::sqrt(zeta);
+        double term2 = -0.1260 * zeta;
+        double term3 = -0.3516 * std::pow(zeta, 2);
+        double term4 = 0.2843 * std::pow(zeta, 3);
+        double term5 = -0.1015 * std::pow(zeta, 4);
+
+        // Scale standard polynomial to our thickness
+        double t_half = (NACA_T / 0.2) * (term1 + term2 + term3 + term4 + term5);
+    }
 
 }
 
