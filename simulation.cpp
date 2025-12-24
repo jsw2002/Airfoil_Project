@@ -96,23 +96,10 @@ STATE compute_flux(const STATE& U, double nx, double ny) {
     return flux;
 }
 
-// Boolean function to check if coordinate is inside grid
-bool is_inside(double x, double y) {
-    // Setting up geometry
-    double chord = 1.0; // Length
-    double x_LE = 0.5; // Start of airfoil in x
-    double centre_y = 0.5; // Centre of airfoil in y
-
-    // Normalise x into a percentage of chord length
-    double zeta = (x - x_LE) / chord;
-
-    // Quick exit if not in airfoil length
-    if (zeta < 0.0 || zeta > chord) return false;
-
-    // Initialising variables for airfoil structure
-    double m = 0.0; // Camber height
+// Helper function to calculate NACA params at specific zeta
+void get_params(double zeta, double& m, double& theta, double& t_half) {
+    m = 0.0; // Camber height
     double dm_dx = 0.0; // Slope
-    double theta = 0.0; // Angle
 
     // Check if airfoil is non symmetrical
     if (NACA_M > 0.0 && NACA_P > 0.0) {
@@ -122,24 +109,50 @@ bool is_inside(double x, double y) {
             dm_dx = (2 * NACA_M / (NACA_P * NACA_P)) * (NACA_P - zeta); // Derivative for theta
         }
         // Back of airfoil
-        if (NACA_P * chord <= zeta) {
+        else {
             m = (NACA_M / ((1 - NACA_P) * (1 - NACA_P))) * (1.0 - zeta) * (1.0 + zeta - 2.0 * NACA_P);
             dm_dx = (2.0 * NACA_M / ((1 - NACA_P) * (1 - NACA_P))) * (NACA_P - zeta); // Derivative for theta
         }
         // Calculate theta
         theta = std::atan(dm_dx);
-
-        // Thickness terms
-        double term1 = 0.2969 * std::sqrt(zeta);
-        double term2 = -0.1260 * zeta;
-        double term3 = -0.3516 * std::pow(zeta, 2);
-        double term4 = 0.2843 * std::pow(zeta, 3);
-        double term5 = -0.1015 * std::pow(zeta, 4);
-
-        // Scale standard polynomial to our thickness
-        double t_half = (NACA_T / 0.2) * (term1 + term2 + term3 + term4 + term5);
+    } else {
+        theta = 0.0;
     }
 
+    // Thickness terms
+    double term1 = 0.2969 * std::sqrt(zeta);
+    double term2 = -0.1260 * zeta;
+    double term3 = -0.3516 * std::pow(zeta, 2);
+    double term4 = 0.2843 * std::pow(zeta, 3);
+    double term5 = -0.1015 * std::pow(zeta, 4);
+
+    // Scale standard polynomial to our thickness
+    t_half = (NACA_T / 0.2) * (term1 + term2 + term3 + term4 + term5);
+
+}
+// Boolean function to check if coordinate is inside grid
+bool is_inside(double x, double y) {
+    // Setting up geometry
+    double chord = 1.0; // Length
+    double x_LE = 0.5; // Start of airfoil in x
+    double centre_y = 0.5; // Centre of airfoil in y
+
+    // Normalise X to grid scale
+    double x_local = (x - x_LE) / chord;
+    double y_local = y - centre_y;
+
+    // Find upper zeta
+    double zeta_U = x_local; // Initial guess
+
+    for (int i = 0; i < 5; ++i) {
+        // Quick exit if not in airfoil length
+        if (zeta_U < 0.0 || zeta_U > chord) break;
+    }
+
+
+
+    // Quick exit if not in airfoil length
+    if (x_local < 0.0 || x_local > chord) return false;
 }
 
 // Initialising grid
