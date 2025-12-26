@@ -284,7 +284,24 @@ STATE compute_rusanov_flux(STATE& UL, STATE& UR, double nx, double ny) {
     // Calculate Wave Speed
     double rhoL, uL, vL, pL;
     get_state(UL, rhoL, uL, vL, pL);
-
     double rhoR, uR, vR, pR;
     get_state(UR, rhoR, uR, vR, pR);
+
+    double cL = std::sqrt(GAMMA * pL / rhoL);
+    double cR = std::sqrt(GAMMA * pR / rhoR);
+    double vnL = uL * nx + vL * ny;
+    double vnR = uR * nx + vR * ny;
+
+    // Max speed
+    double c = std::max(std::abs(vnL) + cL, std::abs(vnR) + cR);
+
+    // Create rusanov flux state
+    STATE flux;
+    flux.rho = 0.5 * (FL.rho   + FR.rho) - 0.5 * c * (UR.rho - UL.rho);
+    flux.rho_u = 0.5 * (FL.rho_u + FR.rho_u) - 0.5 * c * (UR.rho - UL.rho);
+    flux.rho_v = 0.5 * (FL.rho_v + FR.rho_v) - 0.5 * c * (UR.rho - UL.rho);
+    flux.E = 0.5 * (FL.E + FR.E) - 0.5 * c * (UR.E - UL.E);
+
+    return flux;
 }
+
