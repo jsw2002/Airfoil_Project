@@ -305,3 +305,22 @@ STATE compute_rusanov_flux(STATE& UL, STATE& UR, double nx, double ny) {
     return flux;
 }
 
+// CFD solver
+void update_grid(std::vector<STATE> &grid, double dt) {
+    // Temporary new grid to store updates
+    std::vector<STATE> new_grid = grid;
+
+    // Loop to iterate over internal cells
+    for (int j = 1; j < NY - 1; ++j) {
+        for (int i = 1; i < NX - 1; ++i) {
+            int idx = j * NX + i;
+
+            // Check if cell is inside airfoil
+            if (grid[idx].is_solid) continue;
+
+            STATE U_Centre = grid[idx];
+            STATE NetFlux = {0, 0, 0, 0};
+
+        }
+    }
+}
