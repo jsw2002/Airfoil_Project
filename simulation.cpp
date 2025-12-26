@@ -233,7 +233,7 @@ void initialise_grid(std::vector<STATE> &grid) {
 
 void save_to_csv(std::vector<STATE> &grid, int step) {
     // Create filename
-    std::string filename = "output_" + std::to_string(step) + ".csv";
+    std::string filename = "data/output_" + std::to_string(step) + ".csv";
     std::ofstream file(filename);
 
     // Write header
