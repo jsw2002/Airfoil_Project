@@ -16,10 +16,10 @@ struct STATE {
 };
 
 // Simulation constants
-const int NX = 250;
-const int NY = 100;
-const double DX = 0.01;
-const double DY = 0.01;
+const int NX = 500;
+const int NY = 200;
+const double DX = 0.005;
+const double DY = 0.005;
 const double GAMMA = 1.4;
 
 // Function to setup airfoil params from user input

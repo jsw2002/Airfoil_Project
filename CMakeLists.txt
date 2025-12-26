@@ -12,4 +12,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # "airfoil_solver" is the name of the program it will build
 # "main.cpp" is the source file(s) needed to build it
 add_executable(airfoil_solver main.cpp
-        simulation.h)
+        simulation.h
+        simulation.cpp)

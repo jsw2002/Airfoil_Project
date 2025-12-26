@@ -331,6 +331,20 @@ void update_grid(std::vector<STATE> &grid, double dt) {
             STATE U_R = grid[idx_R];
             STATE U_D = grid[idx_D];
             STATE U_U = grid[idx_U];
+
+            // Flux from left
+            if (U_L.is_solid) {
+                double rho, u, v, p;
+                get_state(U_Centre, rho, u, v, p);
+                NetFlux.rho_u += p; // Pressure pushes to the right
+            } else {
+                STATE F = compute_rusanov_flux(U_L, U_Centre, 1.0, 0.0);
+                NetFlux.rho -= F.rho / DX;
+                NetFlux.rho_u -= F.rho_u / DX;
+                NetFlux.rho_v -= F.rho_v / DX;
+                NetFlux.E -= F.E / DX;
+
+            }
         }
     }
 }

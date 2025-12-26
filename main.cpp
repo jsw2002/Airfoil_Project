@@ -40,7 +40,7 @@ int main() {
     // Max Speed ~ Mach 2 (u=2.0) + Sound Speed (c=1.0) = 3.0
     // dx = 0.01
     // Safe dt < 0.01 / 3.0 = 0.0033
-    double dt = 0.001;
+    double dt = 0.0005;
 
     int save_interval = 50;   // Save data every 50 steps
 
