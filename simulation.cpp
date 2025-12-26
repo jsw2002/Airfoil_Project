@@ -81,7 +81,7 @@ void get_state(const STATE& U, double& rho, double& u, double& v, double& p) {
 }
 
 // Function to compute the flux state
-STATE compute_flux(const STATE& U, double nx, double ny) {
+STATE compute_physical_flux(const STATE& U, double nx, double ny) {
     STATE flux;
     double rho, u, v, p;
     get_state(U, rho, u, v , p);
@@ -273,4 +273,18 @@ void save_to_csv(std::vector<STATE> &grid, int step) {
     }
     file.close();
     std::cout << "Saved " << filename << std::endl;
+}
+
+// State to compute Rusanov Flux for shockwaves
+STATE compute_rusanov_flux(STATE& UL, STATE& UR, double nx, double ny) {
+    // Calculate physical fluxes
+    STATE FL = compute_physical_flux(UL, nx, ny);
+    STATE FR = compute_physical_flux(UR, nx, ny);
+
+    // Calculate Wave Speed
+    double rhoL, uL, vL, pL;
+    get_state(UL, rhoL, uL, vL, pL);
+
+    double rhoR, uR, vR, pR;
+    get_state(UR, rhoR, uR, vR, pR);
 }
