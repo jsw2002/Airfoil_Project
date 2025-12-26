@@ -321,6 +321,16 @@ void update_grid(std::vector<STATE> &grid, double dt) {
             STATE U_Centre = grid[idx];
             STATE NetFlux = {0, 0, 0, 0};
 
+            // Neighbouring indices
+            int idx_L = j * NX + (i -1);
+            int idx_R = j * NX + (i + 1);
+            int idx_D = (j - 1) * NX + i;
+            int idx_U = (j + 1) * NX + i;
+
+            STATE U_L = grid[idx_L];
+            STATE U_R = grid[idx_R];
+            STATE U_D = grid[idx_D];
+            STATE U_U = grid[idx_U];
         }
     }
 }
