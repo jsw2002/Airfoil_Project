@@ -9,7 +9,6 @@
 #include <string>
 #include <iomanip>
 #include <algorithm>
-#include <cctype>
 
 // Default airfoil NACA 2412
 double NACA_M = 0.02; // Max camber
@@ -343,7 +342,42 @@ void update_grid(std::vector<STATE> &grid, double dt) {
                 NetFlux.rho_u -= F.rho_u / DX;
                 NetFlux.rho_v -= F.rho_v / DX;
                 NetFlux.E -= F.E / DX;
-
+            }
+            // Flux from right
+            if (U_R.is_solid) {
+                double rho, u, v, p;
+                get_state(U_Centre, rho, u, v, p);
+                NetFlux.rho_u -= p; // Pressure pushes to the left
+            } else {
+                STATE F = compute_rusanov_flux(U_Centre, U_R, 1.0, 0.0);
+                NetFlux.rho += (0.0 - F.rho) / DX;
+                NetFlux.rho_u += (0.0 - F.rho_u) / DX;
+                NetFlux.rho_v += (0.0 - F.rho_v) / DX;
+                NetFlux.E += (0.0 - F.E) / DX;
+            }
+            // Flux from below
+            if (U_D.is_solid) {
+                double rho, u, v, p;
+                get_state(U_Centre, rho, u, v, p);
+                NetFlux.rho_v += p; // Pressure pushes up
+            } else {
+                STATE G = compute_rusanov_flux(U_D, U_Centre, 0.0, 1.0);
+                NetFlux.rho -= G.rho / DX;
+                NetFlux.rho_u -= G.rho_u / DX;
+                NetFlux.rho_v -= G.rho_v / DX;
+                NetFlux.E -= G.E / DX;
+            }
+            // Flux from above
+            if (U_U.is_solid) {
+                double rho, u, v, p;
+                get_state(U_Centre, rho, u, v, p);
+                NetFlux.rho_v -= p; // Pressure pushes down
+            } else {
+                STATE G = compute_rusanov_flux(U_Centre, U_U, 0.0, 1.0);
+                NetFlux.rho += (0.0 - G.rho) / DX;
+                NetFlux.rho_u += (0.0 - G.rho_u) / DX;
+                NetFlux.rho_v += (0.0 - G.rho_v) / DX;
+                NetFlux.E += (0.0 - G.E) / DX;
             }
         }
     }
