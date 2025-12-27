@@ -379,6 +379,14 @@ void update_grid(std::vector<STATE> &grid, double dt) {
                 NetFlux.rho_v += (0.0 - G.rho_v) / DX;
                 NetFlux.E += (0.0 - G.E) / DX;
             }
+
+            // Update state of cell
+            new_grid[idx].rho += NetFlux.rho * dt;
+            new_grid[idx].rho_u += NetFlux.rho_u * dt;
+            new_grid[idx].rho_v += NetFlux.rho_v * dt;
+            new_grid[idx].E += NetFlux.E * dt;
         }
     }
+    // Overwrite grid
+    grid = new_grid;
 }
