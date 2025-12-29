@@ -237,7 +237,7 @@ void initialise_grid(std::vector<STATE> &grid) {
 }
 
 // Calculate dt using the CFL condition
-double calaculate_dt(const std::vector<STATE>& grid, double CFL_number) {
+double calculate_dt(const std::vector<STATE>& grid, double CFL_number) {
     // Initialise variable
     double max_speed = 0.0;
 
