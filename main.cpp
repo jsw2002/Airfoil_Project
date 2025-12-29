@@ -34,14 +34,14 @@ int main() {
     double total_time = 4.0;
     double current_time = 0.0;
     int step = 0;
-    double CFL_number = 0.5;
+    double CFL_target = 0.5;
 
     int save_interval = 50;   // Save data every 50 steps
 
     while (current_time < total_time) {
 
         // Calculate dt
-        double dt = calculate_dt(grid, CFL_number);
+        double dt = calculate_dt(grid, CFL_target);
 
         // Run simulation
         update_grid(grid, dt);
