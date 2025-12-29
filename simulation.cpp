@@ -86,7 +86,7 @@ STATE compute_physical_flux(const STATE& U, double nx, double ny) {
     get_state(U, rho, u, v , p);
 
     // Normal Velocity to face
-    double vn = u * nx + v + ny;
+    double vn = u * nx + v * ny;
 
     flux.rho   = rho * vn;
     flux.rho_u = rho * u * vn + p * nx;
@@ -292,14 +292,14 @@ STATE compute_rusanov_flux(STATE& UL, STATE& UR, double nx, double ny) {
     double vnR = uR * nx + vR * ny;
 
     // Max speed
-    double c = std::max(std::abs(vnL) + cL, std::abs(vnR) + cR);
+    double max_speed = std::max(std::abs(vnL) + cL, std::abs(vnR) + cR);
 
     // Create rusanov flux state
     STATE flux;
-    flux.rho = 0.5 * (FL.rho   + FR.rho) - 0.5 * c * (UR.rho - UL.rho);
-    flux.rho_u = 0.5 * (FL.rho_u + FR.rho_u) - 0.5 * c * (UR.rho - UL.rho);
-    flux.rho_v = 0.5 * (FL.rho_v + FR.rho_v) - 0.5 * c * (UR.rho - UL.rho);
-    flux.E = 0.5 * (FL.E + FR.E) - 0.5 * c * (UR.E - UL.E);
+    flux.rho = 0.5 * (FL.rho   + FR.rho) - 0.5 * max_speed * (UR.rho - UL.rho);
+    flux.rho_u = 0.5 * (FL.rho_u + FR.rho_u) - 0.5 * max_speed * (UR.rho_u - UL.rho_u);
+    flux.rho_v = 0.5 * (FL.rho_v + FR.rho_v) - 0.5 * max_speed * (UR.rho_v - UL.rho_v);
+    flux.E = 0.5 * (FL.E + FR.E) - 0.5 * max_speed * (UR.E - UL.E);
 
     return flux;
 }
@@ -335,49 +335,49 @@ void update_grid(std::vector<STATE> &grid, double dt) {
             if (U_L.is_solid) {
                 double rho, u, v, p;
                 get_state(U_Centre, rho, u, v, p);
-                NetFlux.rho_u += p; // Pressure pushes to the right
+                NetFlux.rho_u += p / DX; // Pressure pushes to the right
             } else {
                 STATE F = compute_rusanov_flux(U_L, U_Centre, 1.0, 0.0);
-                NetFlux.rho -= F.rho / DX;
-                NetFlux.rho_u -= F.rho_u / DX;
-                NetFlux.rho_v -= F.rho_v / DX;
-                NetFlux.E -= F.E / DX;
+                NetFlux.rho += F.rho / DX;
+                NetFlux.rho_u += F.rho_u / DX;
+                NetFlux.rho_v += F.rho_v / DX;
+                NetFlux.E += F.E / DX;
             }
             // Flux from right
             if (U_R.is_solid) {
                 double rho, u, v, p;
                 get_state(U_Centre, rho, u, v, p);
-                NetFlux.rho_u -= p; // Pressure pushes to the left
+                NetFlux.rho_u -= p / DX; // Pressure pushes to the left
             } else {
                 STATE F = compute_rusanov_flux(U_Centre, U_R, 1.0, 0.0);
-                NetFlux.rho += (0.0 - F.rho) / DX;
-                NetFlux.rho_u += (0.0 - F.rho_u) / DX;
-                NetFlux.rho_v += (0.0 - F.rho_v) / DX;
-                NetFlux.E += (0.0 - F.E) / DX;
+                NetFlux.rho -= F.rho / DX;
+                NetFlux.rho_u -= F.rho_u / DX;
+                NetFlux.rho_v -= F.rho_v / DX;
+                NetFlux.E -= F.E / DX;
             }
             // Flux from below
             if (U_D.is_solid) {
                 double rho, u, v, p;
                 get_state(U_Centre, rho, u, v, p);
-                NetFlux.rho_v += p; // Pressure pushes up
+                NetFlux.rho_v += p / DY; // Pressure pushes up
             } else {
                 STATE G = compute_rusanov_flux(U_D, U_Centre, 0.0, 1.0);
-                NetFlux.rho -= G.rho / DX;
-                NetFlux.rho_u -= G.rho_u / DX;
-                NetFlux.rho_v -= G.rho_v / DX;
-                NetFlux.E -= G.E / DX;
+                NetFlux.rho += G.rho / DY;
+                NetFlux.rho_u += G.rho_u / DY;
+                NetFlux.rho_v += G.rho_v / DY;
+                NetFlux.E += G.E / DY;
             }
             // Flux from above
             if (U_U.is_solid) {
                 double rho, u, v, p;
                 get_state(U_Centre, rho, u, v, p);
-                NetFlux.rho_v -= p; // Pressure pushes down
+                NetFlux.rho_v -= p / DY; // Pressure pushes down
             } else {
                 STATE G = compute_rusanov_flux(U_Centre, U_U, 0.0, 1.0);
-                NetFlux.rho += (0.0 - G.rho) / DX;
-                NetFlux.rho_u += (0.0 - G.rho_u) / DX;
-                NetFlux.rho_v += (0.0 - G.rho_v) / DX;
-                NetFlux.E += (0.0 - G.E) / DX;
+                NetFlux.rho -= G.rho / DY;
+                NetFlux.rho_u -= G.rho_u / DY;
+                NetFlux.rho_v -= G.rho_v / DY;
+                NetFlux.E -= G.E / DY;
             }
 
             // Update state of cell
