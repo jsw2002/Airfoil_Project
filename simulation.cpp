@@ -10,6 +10,9 @@
 #include <iomanip>
 #include <algorithm>
 
+// Define global variable
+std::string GlobalAirfoilName = "2412";
+
 // Default airfoil NACA 2412
 double NACA_M = 0.02; // Max camber
 double NACA_P = 0.40; // Camber position
@@ -20,6 +23,8 @@ void setup_airfoil() {
     std::string code;
     std::cout << "Enter NACA 4-digit code: ";
     std::cin >> code;
+
+    GlobalAirfoilName = code;
 
     // Safety to default to NACA 0012
     if (code.length() != 4) {
@@ -130,6 +135,7 @@ void get_params(double zeta, double& m, double& theta, double& t_half) {
     t_half = (NACA_T / 0.2) * (term1 + term2 + term3 + term4 + term5);
 
 }
+
 // Boolean function to check if coordinate is inside grid
 bool is_inside(double x, double y) {
     // Setting up geometry
@@ -230,9 +236,44 @@ void initialise_grid(std::vector<STATE> &grid) {
     }
 }
 
+// Calculate dt using the CFL condition
+double calaculate_dt(const std::vector<STATE>& grid, double CFL_number) {
+    // Initialise variable
+    double max_speed = 0.0;
+
+    // Loop through grid
+    for (int idx = 0; idx < NX * NY; ++idx) {
+        // Skip inside airfoil
+        if (grid[idx].is_solid) continue;
+
+        // Get state and assign to variables
+        double rho = grid[idx].rho;
+        double u = grid[idx].rho_u / rho;
+        double v = grid[idx].rho_v / rho;
+        double p = (GAMMA - 1.0) * (grid[idx].E - 0.5 * rho * (u*u + v*v));
+
+        // Speed of sound
+        double c = std::sqrt(GAMMA * p / rho);
+
+        // Speed of the fastest wave crossing the cell
+        double speed_x = std::abs(u) + c;
+        double speed_y = std::abs(v) + c;
+        double local_speed = speed_x / DX + speed_y / DY;
+
+        // Check if max speed needs updating
+        if (local_speed > max_speed) {
+            max_speed = local_speed;
+        }
+    }
+
+    // Return dt using CFL formula: dt = CFL / (max_speed / dx)
+    // Note already divided by dx/dy
+    return CFL_number / max_speed;
+}
+
 void save_to_csv(std::vector<STATE> &grid, int step) {
     // Create filename
-    std::string filename = "data/output_" + std::to_string(step) + ".csv";
+    std::string filename = "data/NACA-" + GlobalAirfoilName + "/output_" + std::to_string(step) + ".csv";
     std::ofstream file(filename);
 
     // Write header

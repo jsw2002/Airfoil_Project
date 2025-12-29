@@ -5,6 +5,10 @@
 #define AIRFOILCFD_SIMULATION_H
 
 #include <vector>
+#include <string>
+
+// Global Variable to be used
+extern std::string GlobalAirfoilName;
 
 // Defining the state structure of a cell
 struct STATE {
@@ -27,6 +31,9 @@ void setup_airfoil();
 
 // Function to initialise grid
 void initialise_grid(std::vector<STATE>& grid);
+
+// Function to calculate dt
+double calculate_dt(std::vector<STATE>& grid, double CFL_number);
 
 // Function to save to csv for python plotting
 void save_to_csv(std::vector<STATE>& grid, int step);
