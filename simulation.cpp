@@ -261,9 +261,12 @@ void initialise_grid(std::vector<STATE> &grid) {
             if (is_inside(x_phys, y_phys)) {
                 grid[idx] = wall;       // Initialise wall cell
                 grid[idx].is_solid = true; // Mark for solver
+                get_normal(x_phys, y_phys, grid[idx].nx, grid[idx].ny); // Call normal vector
             } else {
                 grid[idx] = freestream; // Initialise freestream cell
                 grid[idx].is_solid = false;
+                grid[idx].nx = 0.0;
+                grid[idx].ny = 0.0;
             }
         }
     }
