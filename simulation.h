@@ -17,6 +17,8 @@ struct STATE {
     double rho_v; // Momentum Y
     double E; // Energy
     bool is_solid; // True if inside airfoil structure
+    double nx; // Normal x direction to wall
+    double ny; // Normal y direction to wall
 };
 
 // Simulation constants
