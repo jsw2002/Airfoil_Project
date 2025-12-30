@@ -480,3 +480,19 @@ double update_grid(std::vector<STATE> &grid, double dt) {
 
     return max_rho_change;
 }
+
+// Function to update ghost cells
+void update_ghost_cells(std::vector<STATE>& grid) {
+    // Loop through grid starts at
+    // j = (0.3 / DY) - 10 and i = (0.5 / DX) - 10
+    // ends at
+    // j = (0.7 / DY) + 10 and i = (1.5 / DX) + 10
+    for (int j = 110; j < 280; ++j) {
+        for (int i = 190; i < 610; ++i) {
+            int idx = j * NX + i;
+
+            // Check to only update solid cells
+            if (!grid[idx].is_solid) continue;
+        }
+    }
+}
