@@ -346,9 +346,12 @@ STATE compute_rusanov_flux(STATE& UL, STATE& UR, double nx, double ny) {
 }
 
 // CFD solver
-void update_grid(std::vector<STATE> &grid, double dt) {
+double update_grid(std::vector<STATE> &grid, double dt) {
     // Temporary new grid to store updates
     std::vector<STATE> new_grid = grid;
+
+    // Variable to track max change of density for stopping logic
+    double max_rho_change = 0.0;
 
     // Loop to iterate over internal cells
     for (int j = 1; j < NY - 1; ++j) {
@@ -421,13 +424,23 @@ void update_grid(std::vector<STATE> &grid, double dt) {
                 NetFlux.E -= G.E / DY;
             }
 
+            // Calculate desnity change
+            double rho_change = NetFlux.rho * dt;
+
             // Update state of cell
-            new_grid[idx].rho += NetFlux.rho * dt;
+            new_grid[idx].rho += rho_change;
             new_grid[idx].rho_u += NetFlux.rho_u * dt;
             new_grid[idx].rho_v += NetFlux.rho_v * dt;
             new_grid[idx].E += NetFlux.E * dt;
+
+            // Check if density change is greater than maximum
+            if (std::abs(rho_change) > max_rho_change) {
+                max_rho_change = std::abs(rho_change);
+            }
         }
     }
     // Overwrite grid
     grid = new_grid;
+
+    return max_rho_change;
 }

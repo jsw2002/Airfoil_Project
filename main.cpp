@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <vector>
-#include <cstdlib>
 #include "simulation.h"
 
 int main() {
@@ -36,7 +35,9 @@ int main() {
     int step = 0;
     double CFL_target = 0.5;
 
-    int save_interval = 50;   // Save data every 50 steps
+    int save_interval = 10;   // Save data every 10 steps
+
+    double tolerance = 1e-6; // Tolerance for stopping logic
 
     while (current_time < total_time) {
 
@@ -44,11 +45,17 @@ int main() {
         double dt = calculate_dt(grid, CFL_target);
 
         // Run simulation
-        update_grid(grid, dt);
+        double max_change = update_grid(grid, dt);
 
         // Update Time
         current_time += dt;
         step++;
+
+        // Stopping logic
+        if (step > 100 && max_change < tolerance) {
+            save_to_csv(grid, step);
+            break;
+        }
 
         // Save / Print Progress
         if (step % save_interval == 0) {

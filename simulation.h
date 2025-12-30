@@ -33,12 +33,12 @@ void setup_airfoil();
 void initialise_grid(std::vector<STATE>& grid);
 
 // Function to calculate dt
-double calculate_dt(std::vector<STATE>& grid, double CFL_number);
+double calculate_dt(const std::vector<STATE>& grid, double CFL_number);
 
 // Function to save to csv for python plotting
 void save_to_csv(std::vector<STATE>& grid, int step);
 
 // Function to update grid
-void update_grid(std::vector<STATE>& grid, double dt);
+double update_grid(std::vector<STATE>& grid, double dt);
 
 #endif //AIRFOILCFD_SIMULATION_H
