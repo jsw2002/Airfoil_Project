@@ -231,7 +231,7 @@ void get_normal(double x, double y, double &nx, double &ny) {
     } else {
         // Lower surface
         nx = -std::sin(theta);
-        ny = -std::cos(theta):
+        ny = -std::cos(theta);
     }
 
 }
