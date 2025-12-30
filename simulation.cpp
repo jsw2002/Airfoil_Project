@@ -493,6 +493,43 @@ void update_ghost_cells(std::vector<STATE>& grid) {
 
             // Check to only update solid cells
             if (!grid[idx].is_solid) continue;
+
+            // Neighbouring indices
+            int idx_L = j * NX + (i -1);
+            int idx_R = j * NX + (i + 1);
+            int idx_D = (j - 1) * NX + i;
+            int idx_U = (j + 1) * NX + i;
+
+            // Initialise pointer
+            STATE* fluid_neighbour = nullptr;
+
+            // Due to geometry of airfoil first check vertically
+            if (!grid[idx_U].is_solid) fluid_neighbour = &grid[idx_U];
+            else if (!grid[idx_D].is_solid) fluid_neighbour = &grid[idx_D];
+            else if (!grid[idx_L].is_solid) fluid_neighbour = &grid[idx_L];
+            else if (!grid[idx_R].is_solid) fluid_neighbour = &grid[idx_R];
+
+            // if cell fully inside airfoil continue
+            if (fluid_neighbour = nullptr) continue;
+
+            // Copy state of cell
+            double rho, u, v, p;
+            get_state(*fluid_neighbour, rho, u, v, p);
+
+            // Reflect Velocity Vector
+            double nx = grid[idx].nx;
+            double ny = grid[idx].ny;
+
+            double dot_product = u * nx + v * ny;
+
+            double u_ghost = u - 2.0 * dot_product * nx;
+            double v_ghost = v - 2.0 * dot_product * ny;
+
+            // Write back to Ghost Cell
+            grid[idx].rho = rho;
+            grid[idx].rho_u = rho * u_ghost;
+            grid[idx].rho_v = rho * v_ghost;
+            grid[idx].E  = (p / (GAMMA - 1.0)) + 0.5 * rho * (u_ghost * u_ghost + v_ghost * v_ghost);
         }
     }
 }
