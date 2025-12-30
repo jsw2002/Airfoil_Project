@@ -35,7 +35,7 @@ int main() {
     int step = 0;
     double CFL_target = 0.5;
 
-    int save_interval = 10;   // Save data every 10 steps
+    int save_interval = 50;   // Save data every 10 steps
 
     double tolerance = 1e-6; // Tolerance for stopping logic
 
