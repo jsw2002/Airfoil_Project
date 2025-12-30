@@ -41,6 +41,9 @@ int main() {
 
     while (current_time < total_time) {
 
+        // Update ghost cells
+        update_ghost_cells(grid);
+
         // Calculate dt
         double dt = calculate_dt(grid, CFL_target);
 

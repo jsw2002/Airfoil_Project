@@ -43,4 +43,7 @@ void save_to_csv(std::vector<STATE>& grid, int step);
 // Function to update grid
 double update_grid(std::vector<STATE>& grid, double dt);
 
+// Function to update ghost cells
+void update_ghost_cells(std::vector<STATE>& grid);
+
 #endif //AIRFOILCFD_SIMULATION_H
