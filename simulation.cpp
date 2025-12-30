@@ -510,7 +510,7 @@ void update_ghost_cells(std::vector<STATE>& grid) {
             else if (!grid[idx_R].is_solid) fluid_neighbour = &grid[idx_R];
 
             // if cell fully inside airfoil continue
-            if (fluid_neighbour = nullptr) continue;
+            if (fluid_neighbour == nullptr) continue;
 
             // Copy state of cell
             double rho, u, v, p;
