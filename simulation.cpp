@@ -203,6 +203,22 @@ bool is_inside(double x, double y) {
     return (y_local <= y_upper && y_local >= y_lower);
 }
 
+// Helper function to get the normal vector for the airfoil
+void get_normal(double x, double y, double &nx, double &ny) {
+    // Normalise X
+    double chord = 1.0; // Length
+    double x_LE = 0.5; // Start of airfoil in x
+    double x_local = (x - x_LE) / chord;
+
+    // Safety for nose/tail
+    if (x_local < 0.001) x_local = 0.001;
+    if (x_local > 0.999) x_local = 0.999;
+
+    // Get slope
+    double m, theta, t;
+    get_params(x_local, m, theta, t);
+}
+
 // Initialising grid
 void initialise_grid(std::vector<STATE> &grid) {
     // Defining normalised freestream
