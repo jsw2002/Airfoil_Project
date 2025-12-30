@@ -217,6 +217,23 @@ void get_normal(double x, double y, double &nx, double &ny) {
     // Get slope
     double m, theta, t;
     get_params(x_local, m, theta, t);
+
+    // Assign m_local for Upper/Lower surface check
+    double m_local = m;
+
+    // Convert slope to normal vector
+    // Slope vector is (cos(theta) sin(theta))
+    // Orthogonal vector is (-sin(theta) cos(theta)
+    if (y > m_local + 0.5) {
+        // Upper surface
+        nx = -std::sin(theta);
+        ny = std::cos(theta);
+    } else {
+        // Lower surface
+        nx = -std::sin(theta);
+        ny = -std::cos(theta):
+    }
+
 }
 
 // Initialising grid
