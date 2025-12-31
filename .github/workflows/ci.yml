@@ -1,0 +1,23 @@
+name: C++ CI
+
+on: [push, pull_request]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install Tools
+              run: sudo apt-get update && sudo apt-get install -y cmake g++ build-essential
+
+            - name: Configure CMake
+              run: cmake -B build -S .
+
+            - name: Build Project
+              run: cmake --build build
+              
+            - name: Run Tests
+              run: ./build/run_tests
+            
