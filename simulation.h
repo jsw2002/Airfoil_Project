@@ -10,6 +10,12 @@
 // Sim Global: Airfoil name used for directory and file naming
 extern std::string GlobalAirfoilName;
 
+// Sim Global: NACA airfoil code and Mach number to be used in testing
+extern double NACA_M;
+extern double NACA_P;
+extern double NACA_T;
+extern double MachNumber;
+
 // Represents the fluid properties at a single grid point
 struct FluidState {
     double rho;      // Density

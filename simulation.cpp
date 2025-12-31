@@ -13,6 +13,7 @@ std::string GlobalAirfoilName = "2412";
 double NACA_M = 0.02; // Max camber
 double NACA_P = 0.40; // Camber position
 double NACA_T = 0.12; // Thickness
+double MachNumber = 2.0;
 
 void promptUserForAirfoilParams() {
     std::string code;
