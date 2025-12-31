@@ -14,7 +14,7 @@ extern std::string GlobalAirfoilName;
 extern double NACA_M;
 extern double NACA_P;
 extern double NACA_T;
-extern double MachNumber;
+extern double Mach_Number;
 
 // Represents the fluid properties at a single grid point
 struct FluidState {
