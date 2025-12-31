@@ -7,43 +7,32 @@
 #include <vector>
 #include <string>
 
-// Global Variable to be used
+// Sim Global: Airfoil name used for directory and file naming
 extern std::string GlobalAirfoilName;
 
-// Defining the state structure of a cell
-struct STATE {
-    double rho; // Density
-    double rho_u; // Momentum X
-    double rho_v; // Momentum Y
-    double E; // Energy
-    bool is_solid; // True if inside airfoil structure
-    double nx; // Normal x direction to wall
-    double ny; // Normal y direction to wall
+// Represents the fluid properties at a single grid point
+struct FluidState {
+    double rho;      // Density
+    double rho_u;    // Momentum X
+    double rho_v;    // Momentum Y
+    double E;        // Total Energy
+    bool is_solid;   // Boundary condition flag
+    double nx;       // Surface normal X (for solid boundaries)
+    double ny;       // Surface normal Y (for solid boundaries)
 };
 
-// Simulation constants
-const int NX = 1000;
-const int NY = 400;
-const double DX = 0.0025;
-const double DY = 0.0025;
+// Domain Constants
+const int NX = 500;
+const int NY = 200;
+const double DX = 0.005;
+const double DY = 0.005;
 const double GAMMA = 1.4;
 
-// Function to setup airfoil params from user input
-void setup_airfoil();
-
-// Function to initialise grid
-void initialise_grid(std::vector<STATE>& grid);
-
-// Function to calculate dt
-double calculate_dt(const std::vector<STATE>& grid, double CFL_number);
-
-// Function to save to csv for python plotting
-void save_to_csv(std::vector<STATE>& grid, int step);
-
-// Function to update grid
-double update_grid(std::vector<STATE>& grid, double dt);
-
-// Function to update ghost cells
-void update_ghost_cells(std::vector<STATE>& grid);
+void promptUserForAirfoilParams();
+void initializeGrid(std::vector<FluidState>& grid, double mach);
+double calculateTimeStep(const std::vector<FluidState>& grid, double CFL_number);
+void exportSnapshot(std::vector<FluidState>& grid, int step);
+double advanceTimeStep(std::vector<FluidState>& grid, double dt);
+void updateGhostCells(std::vector<FluidState>& grid);
 
 #endif //AIRFOILCFD_SIMULATION_H

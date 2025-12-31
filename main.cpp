@@ -1,71 +1,62 @@
-//
-// Created by Wilson, James S on 19/12/2025.
-//
-
 #include <iostream>
 #include <vector>
+#include <filesystem>
 #include "simulation.h"
 
+namespace fs = std::filesystem;
+
 int main() {
+    // Get simulation configuration from user
+    promptUserForAirfoilParams();
 
-    // Ask user for input
-    setup_airfoil();
+    double mach_number;
+    std::cout << "Enter Mach Number (e.g. 0.8, 1.5, 2.0): ";
+    std::cin >> mach_number;
 
-    // Setup directory
-    std::string folder = "data/NACA-" + GlobalAirfoilName;
+    // Prepare output directory
+    std::string folder_path = "data/NACA-" + GlobalAirfoilName;
+    if (fs::exists(folder_path)) {
+        fs::remove_all(folder_path);
+    }
+    fs::create_directories(folder_path);
 
-    // If the folder exists delete it
-    std::string clean_cmd = "rm -rf " + folder;
-    system(clean_cmd.c_str());
+    // Initialize simulation domain
+    std::vector<FluidState> grid(NX * NY);
+    initializeGrid(grid, mach_number);
 
-    // Recreate the folder
-    std::string create_cmd = "mkdir -p " + folder;
-    system(create_cmd.c_str());
+    // Save initial state
+    exportSnapshot(grid, 0);
 
-    // Initialising grid
-    std::vector<STATE> grid(NX * NY);
-    initialise_grid(grid);
-
-    // Save the initial state (t=0)
-    save_to_csv(grid, 0);
-
-    // Simulation params
+    // Time integration parameters
     double total_time = 4.0;
     double current_time = 0.0;
     int step = 0;
     double CFL_target = 0.5;
+    double tolerance = 1e-4; // Convergence threshold
+    int save_interval = 50;
 
-    int save_interval = 50;   // Save data every 10 steps
-
-    double tolerance = 1e-6; // Tolerance for stopping logic
-
+    // Main time-stepping loop
     while (current_time < total_time) {
+        updateGhostCells(grid);
 
-        // Update ghost cells
-        update_ghost_cells(grid);
+        double dt = calculateTimeStep(grid, CFL_target);
+        double max_change = advanceTimeStep(grid, dt);
 
-        // Calculate dt
-        double dt = calculate_dt(grid, CFL_target);
-
-        // Run simulation
-        double max_change = update_grid(grid, dt);
-
-        // Update Time
         current_time += dt;
         step++;
 
-        // Stopping logic
+        // Check for steady-state convergence
         if (step > 100 && max_change < tolerance) {
-            save_to_csv(grid, step);
+            exportSnapshot(grid, step);
+            std::cout << "Converged at step " << step << std::endl;
             break;
         }
 
-        // Save / Print Progress
+        // Periodic validaton output
         if (step % save_interval == 0) {
             std::cout << "Step: " << step
                       << " | Time: " << current_time << "s" << std::endl;
-
-            save_to_csv(grid, step);
+            exportSnapshot(grid, step);
         }
     }
 
