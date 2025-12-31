@@ -9,9 +9,8 @@ int main() {
     // Get simulation configuration from user
     promptUserForAirfoilParams();
 
-    double mach_number;
     std::cout << "Enter Mach Number (e.g. 0.8, 1.5, 2.0): ";
-    std::cin >> mach_number;
+    std::cin >> Mach_Number;
 
     // Prepare output directory
     std::string folder_path = "data/NACA-" + GlobalAirfoilName;
@@ -22,7 +21,7 @@ int main() {
 
     // Initialize simulation domain
     std::vector<FluidState> grid(NX * NY);
-    initializeGrid(grid, mach_number);
+    initializeGrid(grid, Mach_Number);
 
     // Save initial state
     exportSnapshot(grid, 0);
